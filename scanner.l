@@ -17,8 +17,8 @@ TYPES (void|string|int|char|double|const)
 "/*" {for(i=0;i<yyleng;i++) buf[pos++]=yytext[i];BEGIN COMMENT;}
 "#pragma"(" ")+"source"(" ")+"on"(" ")*[\n] {++num_lines;source=1;printf("%d:%s",num_lines,yytext);fprintf(yyout,"%d:%s",num_lines,yytext);}
 "#pragma"(" ")+"source"(" ")+"on"(" ")*[/][/](.)*[\n] {++num_lines;source=1;printf("%d:%s",num_lines,yytext);fprintf(yyout,"%d:%s",num_lines,yytext);}
-"#pragma"(" ")+"source"(" ")+"off"(" ")*[\n] {++num_lines;source=0;printf("%d:%s",num_lines,yytext);fprintf(yyout,"%d:%s",num_lines,yytext);}
-"#pragma"(" ")+"source"(" ")+"off"(" ")*[/][/](.)*[\n] {++num_lines;source=0;printf("%d:%s",num_lines,yytext);fprintf(yyout,"%d:%s",num_lines,yytext);}
+"#pragma"(" ")+"source"(" ")+"off"(" ")*[\n] {++num_lines;source=0;if(source) {printf("%d:%s",num_lines,yytext);fprintf(yyout,"%d:%s",num_lines,yytext);}}
+"#pragma"(" ")+"source"(" ")+"off"(" ")*[/][/](.)*[\n] {++num_lines;source=0;if(source) {printf("%d:%s",num_lines,yytext);fprintf(yyout,"%d:%s",num_lines,yytext);}}
 "#pragma"(" ")+"token"(" ")+"on"(" ")*[\n] {++num_lines;token=1;if(source) printf("%d:%s",num_lines,yytext);if(source) fprintf(yyout,"%d:%s",num_lines,yytext);}
 "#pragma"(" ")+"token"(" ")+"on"(" ")*[/][/](.)*[\n] {++num_lines;token=1;if(source) printf("%d:%s",num_lines,yytext);if(source) fprintf(yyout,"%d:%s",num_lines,yytext);}
 "#pragma"(" ")+"token"(" ")+"off"(" ")*[\n] {++num_lines;token=0;if(source) printf("%d:%s",num_lines,yytext);if(source) fprintf(yyout,"%d:%s",num_lines,yytext);}
@@ -43,7 +43,7 @@ void|int|double|bool|char|null|for|while|do|if|else|switch|return|break|continue
 =(" ")*[^"(" ")]+\"[^"]+\" {++num_lines;fprintf(stderr,"Error at line %d:%s\n",num_lines,yytext);exit(1);}
 ["][^\n]+["] {for(i=0;i<yyleng;i++) buf[pos++]=yytext[i];for(i=0;i<yyleng;i++){if(yytext[i]!='\"') str[tmp++]=yytext[i]; }str[tmp]='\0';tmp=0;if(token) printf("#string:%s\n",str);if(token) fprintf(yyout,"#string:%s\n",str);}
 {TYPES}(" ")+[^a-zA-Z0-9][a-zA-Z0-9_]*(" ")+(=)*(" ")* {++num_lines;fprintf(stderr,"Error at line %d:%s\n",num_lines,yytext);exit(1);}
-[0-9]+[.]*[0-9]*[Ee][-+]*[1-9]+ {if(token) printf("#sci:%s\n",yytext);for(i=0;i<yyleng;i++) buf[pos++]=yytext[i];if(token) fprintf(yyout,"#sci:%s\n",yytext);}
+[0-9]+[.]*[0-9]*[Ee][-+]*[0-9]+ {if(token) printf("#sci:%s\n",yytext);for(i=0;i<yyleng;i++) buf[pos++]=yytext[i];if(token) fprintf(yyout,"#sci:%s\n",yytext);}
 " " {for(i=0;i<yyleng;i++) buf[pos++]=yytext[i];}
 <COMMENT>"*/" {for(i=0;i<yyleng;i++) buf[pos++]=yytext[i];BEGIN 0;}
 <COMMENT>"/*" {for(i=0;i<yyleng;i++) buf[pos++]=yytext[i];BEGIN COMMENT;}
